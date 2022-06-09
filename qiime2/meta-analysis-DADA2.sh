@@ -415,51 +415,6 @@ qiime feature-table summarize \
 
 cd ..
 
-#NCBI_SRP050189
-cd NCBI_SRP050189
-
-#import data
-qiime tools import \
-  --type 'SampleData[SequencesWithQuality]' \
-  --input-path NCBI_SRP050189_manifest.csv \
-  --output-path NCBI_SRP050189.qza \
-  --input-format SingleEndFastqManifestPhred33
-
-#trim peimers
-qiime cutadapt trim-single \
-  --i-demultiplexed-sequences NCBI_SRP050189.qza \
-  --p-adapter ACGCGHNRAACCTTACC...ACGGGCRGTGWGTRCAA \
-  --p-match-read-wildcards True \
-  --p-discard-untrimmed True \
-  --o-trimmed-sequences NCBI_SRP050189-trimmed-primers.qza \
-  --verbose \
-&> primer_trimming.log
-
-#quality check using qiime2
-qiime demux summarize \
-  --i-data NCBI_SRP050189-trimmed-primers.qza \
-  --o-visualization NCBI_SRP050189-trimmed-primers.qzv
-
-#DADA2 methods
-qiime dada2 denoise-pyro \
---i-demultiplexed-seqs NCBI_SRP050189-trimmed-primers.qza \
---p-trunc-len 300 \
---p-trim-left 0 \
---p-max-ee 2 \
---p-trunc-q 2 \
---p-max-len 0 \
---p-chimera-method consensus \
---p-n-threads 0 \
---o-table NCBI_SRP050189-dada2-table.qza \
---o-representative-sequences NCBI_SRP050189-dada2-rep-seqs.qza \
---o-denoising-stats NCBI_SRP050189-dada2-stas.qza \
---verbose
-
-qiime feature-table summarize \
-  --i-table NCBI_SRP050189-dada2-table.qza \
-  --o-visualization NCBI_SRP050189-dada2-table.qzv 
-  
-cd ..
 
 #NCBI_SRS476588
 cd NCBI_SRS476588
@@ -566,31 +521,6 @@ qiime feature-table summarize \
 cd ..
 
 
-#获得数据
-get -r ./meta-analysis/ E:/QIIME2/
-
-
-
-scp ibcas_share@192.168.70.98:/home/data/ibcas_share/meta-analysis/meta_data/ENA_PRJEB40506/ENA_PRJEB40506-dada2-table.qzv /mnt/e/QIIME2/meta-analysis/meta-data/ENA_PRJEB40506/ENA_PRJEB40506-dada2-table.qzv
-scp ibcas_share@192.168.70.98:/home/data/ibcas_share/meta-analysis/meta_data/NCBI_PRJEB36731/NCBI_PRJEB36731-dada2-table.qzv /mnt/e/QIIME2/meta-analysis/meta-data/NCBI_PRJEB36731/NCBI_PRJEB36731-dada2-table.qzv
-scp ibcas_share@192.168.70.98:/home/data/ibcas_share/meta-analysis/meta_data/ENA_PRJEB25188/ENA_PRJEB25188-dada2-table.qzv /mnt/e/QIIME2/meta-analysis/meta-data/ENA_PRJEB25188/ENA_PRJEB25188-dada2-table.qzv
-scp ibcas_share@192.168.70.98:/home/data/ibcas_share/meta-analysis/meta_data/ENA_PRJEB18117/ENA_PRJEB18117-dada2-table.qzv /mnt/e/QIIME2/meta-analysis/meta-data/ENA_PRJEB18117/ENA_PRJEB18117-tdada2-table.qzv
-scp ibcas_share@192.168.70.98:/home/data/ibcas_share/meta-analysis/meta_data/NCBI_SRP044372/NCBI_SRP044372-dada2-table.qzv /mnt/e/QIIME2/meta-analysis/meta-data/NCBI_SRP044372/NCBI_SRP044372-dada2-table.qzv
-scp ibcas_share@192.168.70.98:/home/data/ibcas_share/meta-analysis/meta_data/NCBI_SRP050189/NCBI_SRP050189-dada2-table.qzv /mnt/e/QIIME2/meta-analysis/meta-data/NCBI_SRP050189/NCBI_SRP050189-dada2-table.qzv
-scp ibcas_share@192.168.70.98:/home/data/ibcas_share/meta-analysis/meta_data/NCBI_SRS476588/NCBI_SRS476588-dada2-table.qzv /mnt/e/QIIME2/meta-analysis/meta-data/NCBI_SRS476588/NCBI_SRS476588-dada2-table.qzv
-scp ibcas_share@192.168.70.98:/home/data/ibcas_share/meta-analysis/meta_data/ENA_PRJEB30970/ENA_PRJEB30970-dada2-table350.qzv /mnt/e/QIIME2/meta-analysis/meta-data/ENA_PRJEB30970/ENA_PRJEB30970-dada2-table350.qzv
-
-get ./meta-analysis/meta_data/ENA_PRJEB40506/ENA_PRJEB40506-dada2-table.qzv e/QIIME2/meta-analysis/meta-data/ENA_PRJEB40506/ENA_PRJEB40506-dada2-table.qzv
-get ./meta-analysis/meta_data/NCBI_PRJEB36731/NCBI_PRJEB36731-dada2-table.qzv e/QIIME2/meta-analysis/meta-data/NCBI_PRJEB36731/NCBI_PRJEB36731-dada2-table.qzv
-get ./meta-analysis/meta_data/ENA_PRJEB25188/ENA_PRJEB25188-dada2-table.qzv e/QIIME2/meta-analysis/meta-data/ENA_PRJEB25188/ENA_PRJEB25188-dada2-table.qzv
-get ./meta-analysis/meta_data/ENA_PRJEB18117/ENA_PRJEB18117-dada2-table.qzv e/QIIME2/meta-analysis/meta-data/ENA_PRJEB18117/ENA_PRJEB18117-dada2-table.qzv
-get ./meta-analysis/meta_data/NCBI_SRP044372/NCBI_SRP044372-dada2-table.qzv e/QIIME2/meta-analysis/meta-data/NCBI_SRP044372/NCBI_SRP044372-dada2-table.qzv
-get ./meta-analysis/meta_data/NCBI_SRP050189/NCBI_SRP050189-dada2-table.qzv e/QIIME2/meta-analysis/meta-data/NCBI_SRP050189/NCBI_SRP050189-dada2-table.qzv
-get ./meta-analysis/meta_data/NCBI_SRS476588/NCBI_SRS476588-dada2-table.qzv e/QIIME2/meta-analysis/meta-data/NCBI_SRS476588/NCBI_SRS476588-dada2-table.qzv
-get ./meta-analysis/meta_data/ENA_PRJEB30970/ENA_PRJEB30970-dada2-table.qzv e/QIIME2/meta-analysis/meta-data/ENA_PRJEB30970/ENA_PRJEB30970-dada2-table.qzv
-
-
-
 #merge represent sequences and features tables
 qiime feature-table merge \
   --i-tables ENA_PRJEB40506/ENA_PRJEB40506-dada2-table.qza \
@@ -598,7 +528,6 @@ qiime feature-table merge \
   --i-tables NCBI_PRJEB36731/NCBI_PRJEB36731-dada2-table.qza \
   --i-tables ENA_PRJEB18117/ENA_PRJEB18117-dada2-table.qza \
   --i-tables NCBI_SRP044372/NCBI_SRP044372-dada2-table.qza \
-  --i-tables NCBI_SRP050189/NCBI_SRP050189-dada2-table.qza \
   --i-tables NCBI_SRS476588/NCBI_SRS476588-dada2-table.qza \
   --i-tables ENA_PRJEB30970/ENA_PRJEB30970-dada2-table.qza \
   --i-tables tibet-data/tibet-sequences-dada2-table.qza \
@@ -611,7 +540,6 @@ qiime feature-table merge-seqs \
   --i-data NCBI_PRJEB36731/NCBI_PRJEB36731-dada2-rep-seqs.qza \
   --i-data ENA_PRJEB18117/ENA_PRJEB18117-dada2-rep-seqs.qza \
   --i-data NCBI_SRP044372/NCBI_SRP044372-dada2-rep-seqs.qza \
-  --i-data NCBI_SRP050189/NCBI_SRP050189-dada2-rep-seqs.qza \
   --i-data NCBI_SRS476588/NCBI_SRS476588-dada2-rep-seqs.qza \
   --i-data ENA_PRJEB30970/ENA_PRJEB30970-dada2-rep-seqs.qza \
   --i-data tibet-data/tibet-sequences-dada2-rep-seqs.qza \
@@ -622,14 +550,14 @@ qiime feature-table merge-seqs \
 cd ..
 qiime tools import \
 --type 'FeatureData[Sequence]' \
---input-path Silva/SILVA_132_QIIME_release/rep_set/rep_set_16S_only/99/silva_132_99_16S.fna \
+--input-path Silva/SILVA_138_QIIME_release/rep_set/rep_set_16S_only/99/silva_138_99_16S.fna \
 --output-path 99-meta-data/ref_99_seqs_16S.qza
 
 
 qiime tools import \
 --type 'FeatureData[Taxonomy]' \
 --input-format HeaderlessTSVTaxonomyFormat \
---input-path Silva/SILVA_132_QIIME_release/taxonomy/16S_only/99/majority_taxonomy_7_levels.txt \
+--input-path Silva/SILVA_138_QIIME_release/taxonomy/16S_only/99/majority_taxonomy_7_levels.txt \
 --output-path 99-meta-data/ref_99_otus_16S_taxonomy.qza
 
 
@@ -660,83 +588,116 @@ cd ..
 qiime feature-classifier fit-classifier-naive-bayes \
   --i-reference-reads 99-meta-data/ref_99_seqs_16S.qza \
   --i-reference-taxonomy 99-meta-data/ref_99_otus_16S_taxonomy.qza \
-  --o-classifier 99-meta-data/classifier_Silva_132_99.qza
+  --o-classifier 99-meta-data/SILVA-138-SSURef-full-length-classifier.qza
 
   
 #=== Test the classifier ====
 qiime feature-classifier classify-sklearn \
-  --i-classifier 99-meta-data/classifier_Silva_132_99.qza \
-  --i-reads 99-meta-data/thermokarst-lakes-rep-seqs-97.qza \
-  --o-classification 99-meta-data/thermokarst-lakes-dn-97-taxonomy.qza
+  --i-classifier SILVA-138-SSURef-full-length-classifier.qza \
+  --i-reads results/thermokarst-lakes-rep-seqs-97.qza \
+  --o-classification results/thermokarst-lakes-dn-97-taxonomy.qza
 
 
 
 #===========	otu table filter	===============
-cd 99-meta-data
+
+mkdir -p results/filter_data
+
+cd results
 qiime feature-table summarize \
 --i-table thermokarst-lakes-table-97.qza \
 --o-visualization thermokarst-lakes-table-97.qzv
 
 
-##samples with a total frequency less than 1000 will be filtered
-qiime feature-table filter-samples \
-  --i-table thermokarst-lakes-table-97.qza \
-  --p-min-frequency 1000 \
-  --o-filtered-table sample-frequency-filtered-table.qza
 
 ###Remove chloroplast and mitochondria:   
 qiime taxa filter-table \
---i-table sample-frequency-filtered-table.qza \
+--i-table thermokarst-lakes-table-97.qza \
 --i-taxonomy thermokarst-lakes-dn-97-taxonomy.qza \
 --p-exclude mitochondria,chloroplast \
---o-filtered-table thermokarst-lakes-table-nomito-nochloro.qza
+--o-filtered-table filter_data/thermokarst-lakes-table-nomito-nochloro.qza
 
 
 ###remove feature frequency less than 10
 
 qiime feature-table filter-features \
---i-table thermokarst-lakes-table-nomito-nochloro.qza \
+--i-table filter_data/thermokarst-lakes-table-nomito-nochloro.qza \
 --p-min-frequency 10 \
---o-filtered-table thermokarst-lakes-table-nomito-nochloro-frequency10.qza
+--o-filtered-table filter_data/thermokarst-lakes-table-nomito-nochloro-frequency10.qza
 
 qiime feature-table summarize \
---i-table thermokarst-lakes-table-nomito-nochloro-frequency10.qza \
---o-visualization thermokarst-lakes-table-nomito-nochloro-frequency10.qzv
+--i-table filter_data/thermokarst-lakes-table-nomito-nochloro-frequency10.qza \
+--o-visualization filter_data/thermokarst-lakes-table-nomito-nochloro-frequency10.qzv
+
+# minum frequency is 1070
+
+
+
 
 #=========	Rarefaction	===============
 qiime feature-table rarefy \
---i-table thermokarst-lakes-table-nomito-nochloro-frequency10.qza \
---p-sampling-depth 1000 \
---o-rarefied-table table-filtered-1000.qza
+--i-table filter_data/thermokarst-lakes-table-nomito-nochloro-frequency10.qza \
+--p-sampling-depth 1070 \
+--o-rarefied-table filter_data/table-filtered-rarefy.qza
 
 
 #=====	Export data =========
 mkdir data_from_qiime2
+mkdir -p filter_data/data_from_qiime2_unrarefied
 qiime tools export \
---input-path table-filtered-1000.qza \
---output-path data_from_qiime2
+--input-path filter_data/table-filtered-rarefy.qza \
+--output-path filter_data/data_from_qiime2
 
 # Convert biom format to tab-separated text format:
 biom convert \
--i data_from_qiime2/feature-table.biom \
--o data_from_qiime2/otu_table.tsv \
+-i filter_data/data_from_qiime2/feature-table.biom \
+-o filter_data/data_from_qiime2/otu_table.tsv \
 --to-tsv
 
 
 # Export representative sequences:
 qiime tools export \
 --input-path thermokarst-lakes-rep-seqs-97.qza \
---output-path data_from_qiime2
+--output-path filter_data/data_from_qiime2
 
 # Export taxonomy table:
 qiime tools export \
 --input-path thermokarst-lakes-dn-97-taxonomy.qza \
---output-path data_from_qiime2
+--output-path filter_data/data_from_qiime2
 
 # Export tree file:
 qiime tools export \
---input-path thermokarst-lakes-rooted-tree-dn-97.qza \
---output-path data_from_qiime2
+--input-path tree/thermokarst-lakes-rooted-tree-dn-97.qza \
+--output-path filter_data/data_from_qiime2
+
+
+#=====	Export unrarefied data =========
+mkdir -p filter_data/data_from_qiime2_unrarefied
+qiime tools export \
+--input-path filter_data/thermokarst-lakes-table-nomito-nochloro-frequency10.qza \
+--output-path filter_data/data_from_qiime2_unrarefied
+
+# Convert biom format to tab-separated text format:
+biom convert \
+-i filter_data/data_from_qiime2_unrarefied/feature-table.biom \
+-o filter_data/data_from_qiime2_unrarefied/otu_table.tsv \
+--to-tsv
+
+
+# Export representative sequences:
+qiime tools export \
+--input-path thermokarst-lakes-rep-seqs-97.qza \
+--output-path filter_data/data_from_qiime2_unrarefied
+
+# Export taxonomy table:
+qiime tools export \
+--input-path thermokarst-lakes-dn-97-taxonomy.qza \
+--output-path filter_data/data_from_qiime2_unrarefied
+
+# Export tree file:
+qiime tools export \
+--input-path tree/thermokarst-lakes-rooted-tree-dn-97.qza \
+--output-path filter_data/data_from_qiime2_unrarefied
 
 #close the qiime2
 conda deactivate
