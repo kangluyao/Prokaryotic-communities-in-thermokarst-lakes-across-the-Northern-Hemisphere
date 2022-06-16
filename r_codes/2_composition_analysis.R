@@ -1,3 +1,57 @@
+#determine the Order compositions within top 10 phylums##
+arrange.tab <- function(phylo, N, taxrank, vect) {
+  subphylo <- tax_glom(phylo, taxrank)
+  subphylo.rel <- microbiome::transform(subphylo, "compositional")
+  ra.tab <- otu_table(subphylo.rel)
+  MRA <- rowMeans(ra.tab)
+  group <- tax_table(subphylo.rel)[,vect]
+  mra.tab <- data.frame(group,MRA)
+  colnames(mra.tab) <- c('level1', 'level2', 'MRA')
+  #arrange the class table
+  mra.tab_level1 = mra.tab %>% group_by(level1) %>% 
+    summarise(sum_MRA = sum(MRA)) %>% 
+    arrange(desc(sum_MRA))
+  top_N_level1 = mra.tab_level1[1:N, ]$'level1'
+  top_N_tab = mra.tab[mra.tab$'level1' %in% top_N_level1, ]
+  mra.tab_level2 = top_N_tab %>% group_by(level2) %>% 
+    summarise(sum_MRA = sum(MRA)) %>% 
+    arrange(desc(sum_MRA))
+  order_level2 = mra.tab_level2$'level2'
+  top_N_tab$'level1' = factor(top_N_tab$'level1', ordered = T, levels = top_N_level1)
+  top_N_tab$'level2' = factor(top_N_tab$'level2', ordered = T, levels = rev(order_level2))
+  top_N_tab$MRA = top_N_tab$MRA*100
+  return(top_N_tab)
+}
+top10phylum_meta <- arrange.tab(meta_physeq, 10, 'Order', c(2,4))
+mra.tab_level2 = top10phylum_meta %>% group_by(level2) %>% 
+  summarise(sum_MRA = sum(MRA)) %>% 
+  arrange(desc(sum_MRA))
+order_level2 = mra.tab_level2$'level2'
+top10phylum_meta_tab
+#ggplot
+## Define the colors you want
+mycols <- c("#89C5DA", "#DA5724", "#74D944", "#CE50CA", "#3F4921", "#C0717C", "#CBD588", "#5F7FC7", 
+            "#673770", "#D3D93E", "#38333E", "#508578", "#D7C1B1", "#689030", "#AD6F3B", "#CD9BCD", 
+            "#D14285", "#6DDE88", "#652926", "#7FDCC0", "#C84248", "#8569D5", "#5E738F", "#D1A33D", 
+            "#8A7C64", "#599861")
+taxa_barplot <- ggplot(top10phylum_meta, aes(fill=level2, y=MRA, x=level1)) + 
+  geom_bar(position="stack", stat="identity") +
+  scale_fill_manual('Order', breaks = order_level2[1:15], 
+                    values = rep(mycols, 20)[1:nrow(top10phylum_meta)]) + #only the top 10 phylum and top 10 order are showed
+  labs(x = 'Phylum', y = 'Mean relative abundance (%)') +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 55)) +
+  theme_classic()+
+  theme(legend.position = c(0.6,0.6),
+        panel.grid=element_blank(), 
+        axis.title = element_text(color='black',size=14),
+        axis.ticks.length = unit(0.4,"lines"), axis.ticks = element_line(color='black'),
+        axis.line = element_line(colour = "black"), 
+        axis.text.y = element_text(colour='black',size=12),
+        axis.text.x = element_text(colour='black', size = 12, angle = 45, hjust = 1),
+        legend.text=element_text(size=12),
+        legend.key=element_blank(),
+        legend.background = element_rect(colour = "white"))
+taxa_barplot
 # melt to long format (for ggplot) 
 otu_num_in_phylum <- data.frame(table(tax_table(meta_physeq)[,"Phylum"]))
 otu_num_in_phylum <- otu_num_in_phylum %>% arrange(desc(Freq))
@@ -13,70 +67,39 @@ otu_count.data <- otu_num_in_phylum %>%
 otu_count.data$Phylum <- factor(otu_count.data$Phylum, ordered = T, levels = otu_num_in_phylum$Phylum)
 
 
-library(RColorBrewer)
-## Define the colors you want
-mycols <- c("#89C5DA", "#DA5724", "#74D944", "#CE50CA", "#3F4921", "#C0717C", "#CBD588", "#5F7FC7", 
-            "#673770", "#D3D93E", "#38333E", "#508578", "#D7C1B1", "#689030", "#AD6F3B", "#CD9BCD", 
-            "#D14285", "#6DDE88", "#652926", "#7FDCC0", "#C84248", "#8569D5", "#5E738F", "#D1A33D", 
-            "#8A7C64", "#599861")
 ## Use scale_fill_manual
 pie_for_otu_num_phylum <- ggplot(otu_count.data, aes(x="", y=prop, fill=reorder(Phylum, -lab.ypos))) +
-  geom_bar(width = 1, stat = "identity", color = "white") + 
+  geom_bar(width = 1, stat = "identity") + 
   coord_polar("y", start=0) +
   geom_text(aes(x = 1.35, y = lab.ypos, 
                 label = paste0(otu_num, ' (', round(prop, 1), '%', ')', sep= '')),
                 color = "white", size=3) +
   scale_fill_manual('Phylum', values = mycols) +
   guides(fill = guide_legend(reverse=T)) +
-  theme_void()
+  theme_void() +
+  theme(legend.position = "left")
 pie_for_otu_num_phylum
 
+#
+library(cowplot)
+compositional_plot <- ggdraw() +
+  draw_plot(pie_for_otu_num_phylum, x = 0, y = 0.5, width = 0.5, height = 0.5) +
+  draw_plot(taxa_barplot, x = 0.5, y = 0, width = 0.5, height = 1) +
+  draw_plot(pie_for_fun, x = 0, y = 0, width = 0.5, height = 0.5) +
+  draw_plot_label(label = c("A", "B", "C"), size = 14,
+                  x = c(0, 0.5, 0), y = c(1, 1, 0.5))
 
-##prune out Order below 1% in each sample and prevalence lower than 10/100 at class level
-meta.com.ord <- microbiome::aggregate_rare(meta_physeq_rel, level = "Order", 
-                                           detection = 1/100, prevalence = 10/100)
-allmean <- rowMeans(otu_table(meta.com.ord))
+compositional_plot
 
-regiontype <- as.factor(sample_data(meta.com.ord)$Region)
-table(regiontype)
-mean_region <- sapply(levels(regiontype),function(i){
-  rowMeans(otu_table(meta.com.ord)[,region == i])
-})
-rel_abun_dat_ord <- data.frame(Phylum = rownames(mean_region), mean_region, All_mean = allmean)
-rel_abun_dat_ord <- dplyr::arrange(rel_abun_dat_ord, desc(All_mean))
-rel_abun_dat_ord
-
-# pie plot for total community composition
-## pie plot
-rel_abun_dat_ord_plot <- data.frame(Order = rownames(rel_abun_dat_ord), prop = rel_abun_dat_ord$All_mean * 100)
-rel_abun_dat_ord_plot$Order <- factor(rel_abun_dat_ord_plot$Order, ordered = T,
-                                      levels = c(rel_abun_dat_ord_plot$Order[-2], 'Other'))
-rel_abun_dat_ord_plot$ypos = cumsum(rel_abun_dat_ord_plot$prop)- 0.5 * rel_abun_dat_ord_plot$prop 
-
-library(RColorBrewer)
-## Define the number of colors you want
-nb.cols <- 9
-mycolors <- colorRampPalette(brewer.pal(8, "Dark2"))(nb.cols)
-## Create a ggplot with 11 colors 
-## Use scale_fill_manual
-pie_for_taxa <- ggplot(rel_abun_dat_ord_plot, aes(x="", y=prop, fill=Order)) +
-  geom_bar(width = 1, stat = "identity") + coord_polar("y", start=0) +
-  scale_fill_manual(values = mycolors) +
-  theme_void() +
-  theme(
-    axis.title.x = element_blank(),
-    axis.title.y = element_blank(),
-    panel.border = element_blank(),
-    panel.grid=element_blank(),
-    axis.ticks = element_blank(),
-    plot.title=element_text(size=14)
-  ) +
-  geom_text(aes(y = ypos, label = scales::percent(prop/100),
-                color = "white", size=6))
-pie_for_taxa
 
 
 # plot the community composition for TP and PA at order level
+
+##prune out Order below 1% in each sample and prevalence lower than 10/100 at class level
+meta_physeq_rel <- microbiome::transform(meta_physeq, "compositional")
+meta.com.ord <- microbiome::aggregate_rare(meta_physeq_rel, level = "Order", 
+                                           detection = 1/100, prevalence = 10/100)
+
 plot.composition.relAbun <- microbiome::plot_composition(meta.com.ord, 
                                                          average_by = "Region", 
                                                          otu.sort = "abundance") +
@@ -169,3 +192,4 @@ domin_class_plot <- plot_grid(plot.gammaproteobacteria.relAbun, plot.actinobacte
                               label_x = .01, label_y = 1.01, hjust = 0, 
                               label_size=14, align = "v")
 domin_class_plot
+
