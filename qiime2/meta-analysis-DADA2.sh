@@ -58,7 +58,7 @@ qiime dada2 denoise-paired \
 --verbose
 
 
-#de novo clustering
+#for alpine data, additional individual de novo clustering was performed.
 cd tibet-data
 qiime vsearch cluster-features-de-novo \
   --i-table sequence-data/tibet-sequences-dada2-table.qza \
@@ -187,7 +187,7 @@ qiime tools import \
   --output-path ENA_PRJEB40506.qza \
   --input-format SingleEndFastqManifestPhred33
 
-#trim peimers
+#trim primers
 qiime cutadapt trim-single \
   --i-demultiplexed-sequences ENA_PRJEB40506.qza \
   --p-adapter AACMGGATTAGATACCCKG...AGGGTTGCGCTCGTTG \
@@ -395,6 +395,9 @@ qiime demux summarize \
   --o-visualization NCBI_SRP044372-trimmed-primers.qzv
 
 #DADA2 methods
+
+	#qiime dada2 denoise-pyro is used for Roche454 and Ion Torrent sequencing platform
+
 qiime dada2 denoise-pyro \
 --i-demultiplexed-seqs NCBI_SRP044372-trimmed-primers.qza \
 --p-trunc-len 300 \
@@ -545,8 +548,8 @@ qiime feature-table merge-seqs \
   --i-data tibet-data/tibet-sequences-dada2-rep-seqs.qza \
   --o-merged-data thermokarst-lakes-rep-seqs.qza
 
-#物种注释
-#导入序列和分类文件
+#species assigned
+#import sequence and taxonomy file
 cd ..
 qiime tools import \
 --type 'FeatureData[Sequence]' \
@@ -560,7 +563,7 @@ qiime tools import \
 --input-path Silva/SILVA_138_QIIME_release/taxonomy/16S_only/99/majority_taxonomy_7_levels.txt \
 --output-path 99-meta-data/ref_99_otus_16S_taxonomy.qza
 
-
+#for global data, closed-reference mapping protocol was performed.
 #Closed-reference clustering
 qiime vsearch cluster-features-closed-reference \
   --i-table meta_data/thermokarst-lakes-table.qza \
