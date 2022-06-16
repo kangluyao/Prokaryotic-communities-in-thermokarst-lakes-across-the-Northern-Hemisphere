@@ -39,7 +39,7 @@ cat ./tibet-sequences-trimmed-joined/7db12470-fcb8-473a-80bb-a9ab5da5a26b/data/*
 fastqc all.fastq
 
 
-
+#quality control using DADA2 methods
 qiime dada2 denoise-paired \
 --i-demultiplexed-seqs tibet-sequences-trimmed.qza \
 --p-trunc-len-f 225 \
@@ -202,7 +202,7 @@ qiime demux summarize \
   --i-data ENA_PRJEB40506-trimmed-primers.qza \
   --o-visualization ENA_PRJEB40506-trimmed-primers.qzv
 
-#DADA2 methods
+#quality control using DADA2 methods
 qiime dada2 denoise-single \
 --i-demultiplexed-seqs ENA_PRJEB40506.qza \
 --p-trunc-len 280 \
@@ -249,7 +249,7 @@ qiime demux summarize \
   --i-data NCBI_PRJEB36731-trimmed-primers.qza \
   --o-visualization NCBI_PRJEB36731-trimmed-primers.qzv
 
-#DADA2 methods
+#quality control using DADA2 methods
 qiime dada2 denoise-single \
 --i-demultiplexed-seqs NCBI_PRJEB36731-trimmed-primers.qza \
 --p-trunc-len 230 \
@@ -295,7 +295,7 @@ qiime demux summarize \
   --i-data ENA_PRJEB25188-trimmed-primers.qza \
   --o-visualization ENA_PRJEB25188-trimmed-primers.qzv
 
-#DADA2 methods
+#quality control using DADA2 methods
 qiime dada2 denoise-single \
 --i-demultiplexed-seqs ENA_PRJEB25188-trimmed-primers.qza \
 --p-trunc-len 270 \
@@ -342,7 +342,7 @@ qiime demux summarize \
   --i-data ENA_PRJEB18117-trimmed-primers.qza \
   --o-visualization ENA_PRJEB18117-trimmed-primers.qzv
 
-#DADA2 methods
+#quality control using DADA2 methods
 qiime dada2 denoise-single \
 --i-demultiplexed-seqs ENA_PRJEB18117-trimmed-primers.qza \
 --p-trunc-len 230 \
@@ -394,7 +394,7 @@ qiime demux summarize \
   --i-data NCBI_SRP044372-trimmed-primers.qza \
   --o-visualization NCBI_SRP044372-trimmed-primers.qzv
 
-#DADA2 methods
+#quality control using DADA2 methods
 
 	#qiime dada2 denoise-pyro is used for Roche454 and Ion Torrent sequencing platform
 
@@ -443,7 +443,7 @@ qiime demux summarize \
   --i-data NCBI_SRS476588-trimmed-primers.qza \
   --o-visualization NCBI_SRS476588-trimmed-primers.qzv
  
-#DADA2 methods
+#quality control using DADA2 methods
 qiime dada2 denoise-pyro \
 --i-demultiplexed-seqs NCBI_SRS476588-trimmed-primers.qza \
 --p-trunc-len 300 \
@@ -502,7 +502,7 @@ qiime demux summarize \
   --i-data ENA_PRJEB30970-trimmed-primers-filter.qza \
   --o-visualization ENA_PRJEB30970-trimmed-primers-filter.qzv
 
-#DADA2 methods
+#quality control using DADA2 methods
 qiime dada2 denoise-pyro \
 --i-demultiplexed-seqs ENA_PRJEB30970-trimmed-primers.qza \
 --p-trunc-len 300 \
