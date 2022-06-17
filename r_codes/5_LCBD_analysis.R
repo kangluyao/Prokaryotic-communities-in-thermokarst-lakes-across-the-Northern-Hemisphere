@@ -252,15 +252,13 @@ partial.mantel.fun <- function(phylo) {
 }
 
 all.total.commun.par.mant <- partial.mantel.fun(meta_physeq)
-all.carbon.commun.par.mant <- partial.mantel.fun(meta_carbon_phy)
 ## PLOT
 ## devtools::install_github('hannet91/ggcor')
 library(ggcor)
 set.seed(123456)
 
-all.par.man.tibble <- tibble(spec = c(rep('all.total.commun.par.mant', nrow(all.total.commun.par.mant)), 
-                                      rep('all.carbon.commun.par.mant', nrow(all.carbon.commun.par.mant))), 
-                             rbind(all.total.commun.par.mant, all.carbon.commun.par.mant))
+all.par.man.tibble <- tibble(spec = c(rep('all.total.commun.par.mant', nrow(all.total.commun.par.mant))), 
+                             all.total.commun.par.mant)
 #par.man.tibble <- tibble(spec = c(rep('Total community composition', nrow(total.commun.par.mant))), 
 #                         total.commun.par.mant)
 vars <- c("MAT", "MAP", "DOC", "SUVA254", "a320", "pH")
